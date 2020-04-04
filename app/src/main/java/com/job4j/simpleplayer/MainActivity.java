@@ -14,8 +14,8 @@ public class MainActivity extends AppCompatActivity {
     private MediaPlayer media;
     private int[] resourceIDs;
     private int count;
-    Button play;
-    Button stop;
+    private Button play;
+    private Button stop;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,15 +47,15 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void mediaCallback(MediaPlayer mediaPlayer) {
-        if (count <= resourceIDs.length) {
-            count++;
-            media.reset();
-            media = MediaPlayer.create(this, resourceIDs[count]);
-            media.start();
-            media.setOnCompletionListener(this::mediaCallback);
-        } else {
+        count++;
+        if (count == resourceIDs.length) {
+            count = 0;
             return;
         }
+        media.reset();
+        media = MediaPlayer.create(this, resourceIDs[count]);
+        media.start();
+        media.setOnCompletionListener(this::mediaCallback);
     }
 
     private void play(View view) {
