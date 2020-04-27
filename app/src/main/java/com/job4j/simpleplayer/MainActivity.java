@@ -3,11 +3,14 @@ package com.job4j.simpleplayer;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.media.MediaPlayer;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.Toast;
 
+import java.io.IOException;
 import java.lang.reflect.Field;
 
 public class MainActivity extends AppCompatActivity {
@@ -16,6 +19,7 @@ public class MainActivity extends AppCompatActivity {
     private int count;
     private Button play;
     private Button stop;
+    private Uri uri;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -23,6 +27,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         play = findViewById(R.id.play);
         stop = findViewById(R.id.stop);
+        uri = getIntent().getData();
         count = 0;
         Field[] fields = R.raw.class.getFields();
         resourceIDs = new int[fields.length];
@@ -33,10 +38,24 @@ public class MainActivity extends AppCompatActivity {
                 e.printStackTrace();
             }
         }
-        media = MediaPlayer.create(this, resourceIDs[count]);
-        media.setOnCompletionListener(this::mediaCallback);
+        if (uri == null) {
+            media = MediaPlayer.create(this, resourceIDs[count]);
+        } else {
+            media = new MediaPlayer();
+            try {
+                media.setDataSource(MainActivity.this, uri);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            try {
+                media.prepare();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
         play.setOnClickListener(this::play);
         stop.setOnClickListener(this::stop);
+        media.setOnCompletionListener(this::mediaCallback);
     }
 
     @Override
